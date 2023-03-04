@@ -49,6 +49,7 @@
     "prettier"
   ],
   "dependencies": {
+    "async": "^3.2.4",
     "bcryptjs": "^2.4.3",
     "compression": "^1.7.4",
     "cors": "^2.8.5",
@@ -68,6 +69,7 @@
     "passport": "^0.4.0",
     "passport-jwt": "^4.0.0",
     "pm2": "^5.1.0",
+    "redis": "^4.6.5",
     "socket.io": "^4.6.1",
     "swagger-jsdoc": "^6.0.8",
     "swagger-ui-express": "^4.1.6",

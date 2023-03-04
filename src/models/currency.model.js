@@ -40,7 +40,7 @@ const currencySchema = mongoose.Schema({
   },
   lastUpdated: {
     type: Date,
-    required: true,
+    default: new Date(),
   },
 });
 
