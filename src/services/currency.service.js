@@ -1,4 +1,3 @@
-const async = require('async');
 const { Currency } = require('../models');
 
 /**
@@ -15,7 +14,9 @@ const createCurrency = async (currencyBody) => {
  * @returns {Promise<Currency>}
  */
 const getCurrencyByPairName = async (pairName) => {
-  return Currency.findOne({ pairName });
+  const data = await Currency.findOne({ pairName });
+
+  return data;
 };
 
 /**
@@ -37,19 +38,10 @@ const updateCurrencyByPairName = async (pairName, currencyBody) => {
  *
  * @param {Object[]} currencies
  */
-const updateCurrencyByBatch = async (currencies) => {
-  async.eachSeries(
-    currencies,
-    function updateObject(obj, done) {
-      // Model.update(condition, doc, callback)
-      Currency.updateOne({ pairName: obj.pairName }, { $set: { [obj.pairName]: obj } }, done);
-    },
-    function allDone(err) {
-      if (err) {
-        console.log('cannot update by batch');
-      }
-    }
-  );
+const updateCurrencyByBatch = (currencies) => {
+  currencies.forEach(async (item) => {
+    await updateCurrencyByPairName(item.pairName, item);
+  });
 };
 
 module.exports = {

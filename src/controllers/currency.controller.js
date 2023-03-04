@@ -31,7 +31,6 @@ const handleSocketConnect = async (socket) => {
   const { query } = socket.handshake;
   // query in DB
   const cacheCurrency = await currencyService.getCurrencyByPairName(query.pairName);
-
   // if currency exists on DB, returns to client.
   if (cacheCurrency) {
     socket.emit(query.pairName, cacheCurrency);

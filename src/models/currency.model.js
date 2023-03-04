@@ -35,8 +35,8 @@ const currencySchema = mongoose.Schema({
   },
   status: {
     type: String,
-    required: true,
     trim: true,
+    default: '',
   },
   lastUpdated: {
     type: Date,
