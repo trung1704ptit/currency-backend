@@ -37,7 +37,15 @@ const handleSocketConnect = async (socket) => {
   }
 };
 
+const getSingleCurrency = catchAsync(async (req, res) => {
+  const { query } = req;
+  const { from, to } = query;
+  const currencyData = await currencyService.getCurrencyByPairName(`${from}/${to}`);
+  res.send(currencyData);
+});
+
 module.exports = {
   updateCurrency,
   handleSocketConnect,
+  getSingleCurrency,
 };

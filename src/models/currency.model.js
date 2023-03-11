@@ -23,6 +23,11 @@ const currencySchema = mongoose.Schema({
     required: true,
     trim: true,
   },
+  dayChangedStatus: {
+    type: String,
+    trim: true,
+    default: '',
+  },
   from: {
     type: String,
     required: true,
@@ -32,11 +37,6 @@ const currencySchema = mongoose.Schema({
     type: String,
     required: true,
     trim: true,
-  },
-  status: {
-    type: String,
-    trim: true,
-    default: '',
   },
   lastUpdated: {
     type: Date,
