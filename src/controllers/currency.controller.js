@@ -32,8 +32,16 @@ const getSingleCurrency = catchAsync(async (req, res) => {
   res.send(currencyData);
 });
 
+const getCurrencyMap = catchAsync(async (req, res) => {
+  const { query } = req;
+  const { from } = query;
+  const currencyData = await currencyService.getCurrencyMapByBaseName(from);
+  res.send(currencyData);
+});
+
 module.exports = {
   updateCurrency,
   handleSocketConnect,
   getSingleCurrency,
+  getCurrencyMap,
 };

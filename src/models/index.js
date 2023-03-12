@@ -1,3 +1,4 @@
 module.exports.Token = require('./token.model');
 module.exports.User = require('./user.model');
-module.exports.Currency = require('./currency.model');
+module.exports.CurrencyPair = require('./currencyPair.model');
+module.exports.CurrencyMap = require('./currencyMap.model');

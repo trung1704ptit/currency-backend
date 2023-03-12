@@ -5,5 +5,6 @@ const router = express.Router();
 
 router.route('/').post(currencyControler.updateCurrency);
 router.route('/').get(currencyControler.getSingleCurrency);
+router.route('/map').get(currencyControler.getCurrencyMap);
 
 module.exports = router;

@@ -1,12 +1,11 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 
-const currencySchema = mongoose.Schema({
+const currencyPairSchema = mongoose.Schema({
   pairName: {
     type: String,
     required: true,
     trim: true,
-    unique: true,
   },
   price: {
     type: Number,
@@ -45,7 +44,7 @@ const currencySchema = mongoose.Schema({
 });
 
 // add plugin that converts mongoose to json
-currencySchema.plugin(toJSON);
+currencyPairSchema.plugin(toJSON);
 
-const Currency = mongoose.model('Currency', currencySchema);
-module.exports = Currency;
+const CurrencyPair = mongoose.model('CurrencyPair', currencyPairSchema);
+module.exports = CurrencyPair;

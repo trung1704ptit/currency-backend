@@ -1,4 +1,4 @@
-const { Currency } = require('../models');
+const { CurrencyPair, CurrencyMap } = require('../models');
 
 /**
  * Create a currency
@@ -6,7 +6,17 @@ const { Currency } = require('../models');
  * @returns {Promise<Currency>}
  */
 const createCurrency = async (currencyBody) => {
-  return Currency.create(currencyBody);
+  const result = CurrencyPair.create(currencyBody);
+  return result;
+};
+
+const createCurrencyMap = async (base, currencyList) => {
+  const result = await CurrencyMap.create({
+    base,
+    mapping: currencyList,
+  });
+
+  return result;
 };
 
 /**
@@ -14,9 +24,17 @@ const createCurrency = async (currencyBody) => {
  * @returns {Promise<Currency>}
  */
 const getCurrencyByPairName = async (pairName) => {
-  const data = await Currency.findOne({ pairName });
+  const data = await CurrencyPair.findOne({ pairName });
 
-  return data;
+  if (data) return data;
+  return null;
+};
+
+const getCurrencyMapByBaseName = async (baseName) => {
+  const data = await CurrencyMap.findOne({ base: baseName });
+
+  if (data) return data;
+  return null;
 };
 
 /**
@@ -34,13 +52,33 @@ const updateCurrencyByPairName = async (pairName, currencyBody) => {
   return currency;
 };
 
+const updateCurrencyMap = async (base, currencyList) => {
+  const currencyMap = await getCurrencyMapByBaseName(base);
+  if (!currencyMap) {
+    return createCurrencyMap(base, currencyList);
+  }
+  CurrencyMap.findOneAndUpdate({ base: base }, { $push: { mapping: currencyList } });
+};
+
 /**
  *
  * @param {Object[]} currencies
  */
+
 const updateCurrencyByBatch = (currencies) => {
+  const groupByCategory = currencies.reduce((group, product) => {
+    const { from } = product;
+    group[from] = group[from] ?? [];
+    group[from].push(product);
+    return group;
+  }, {});
+
   currencies.forEach(async (item) => {
     await updateCurrencyByPairName(item.pairName, item);
+  });
+
+  Object.keys(groupByCategory).forEach(async (key) => {
+    await updateCurrencyMap(key, groupByCategory[key]);
   });
 };
 
@@ -49,4 +87,5 @@ module.exports = {
   getCurrencyByPairName,
   updateCurrencyByPairName,
   updateCurrencyByBatch,
+  getCurrencyMapByBaseName,
 };
