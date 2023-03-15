@@ -46,6 +46,10 @@ const currencyMapSchema = mongoose.Schema({
         required: true,
         trim: true,
       },
+      lastUpdated: {
+        type: Date,
+        default: new Date(),
+      },
     },
   ],
   lastUpdated: {
