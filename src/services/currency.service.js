@@ -30,10 +30,15 @@ const getCurrencyByPairName = async (pairName) => {
   return null;
 };
 
-const getCurrencyMapByBaseName = async (baseName) => {
-  const data = await CurrencyMap.findOne({ base: baseName });
+const getCurrencyMapByBaseName = async (baseName, to) => {
+  let data = await CurrencyMap.findOne({ base: baseName });
 
-  if (data) return data;
+  if (data) {
+    if (to) {
+      data.mapping = data.mapping.filter(item => item.to === to);
+    }
+    return data;
+  }
   return null;
 };
 
@@ -73,9 +78,9 @@ const updateCurrencyByBatch = (currencies) => {
     return group;
   }, {});
 
-  currencies.forEach(async (item) => {
-    await updateCurrencyByPairName(item.pairName, item);
-  });
+  // currencies.forEach(async (item) => {
+  //   await updateCurrencyByPairName(item.pairName, item);
+  // });
 
   Object.keys(groupByCategory).forEach(async (key) => {
     await updateCurrencyMap(key, groupByCategory[key]);

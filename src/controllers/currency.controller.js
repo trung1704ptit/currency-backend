@@ -34,8 +34,8 @@ const getSingleCurrency = catchAsync(async (req, res) => {
 
 const getCurrencyMap = catchAsync(async (req, res) => {
   const { query } = req;
-  const { from } = query;
-  const currencyData = await currencyService.getCurrencyMapByBaseName(from);
+  const { from, to } = query;
+  const currencyData = await currencyService.getCurrencyMapByBaseName(from, to);
   res.send(currencyData);
 });
 
