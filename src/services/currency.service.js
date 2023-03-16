@@ -35,7 +35,7 @@ const getCurrencyMapByBaseName = async (baseName, to) => {
 
   if (data) {
     if (to) {
-      data.mapping = data.mapping.filter(item => item.to === to);
+      data.mapping = data.mapping.filter((item) => item.to === to);
     }
     return data;
   }
@@ -62,7 +62,7 @@ const updateCurrencyMap = async (base, currencyList) => {
   if (!currencyMap) {
     return createCurrencyMap(base, currencyList);
   }
-  CurrencyMap.findOneAndUpdate({ base: base }, { $push: { mapping: currencyList } });
+  await CurrencyMap.findOneAndUpdate({ base: base }, { $set: { mapping: currencyList } });
 };
 
 /**

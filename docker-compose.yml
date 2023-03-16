@@ -16,7 +16,7 @@ services:
       - node-network
 
   mongodb:
-    image: mongo:4.2.1-bionic
+    image: mongo
     ports:
       - '27017:27017'
     volumes:
