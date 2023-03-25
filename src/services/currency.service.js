@@ -1,5 +1,5 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
-
+const { toArray } = require('lodash');
 /**
  * Create a currency
  * @param {Object} currencyBody
@@ -31,13 +31,26 @@ const getCurrencyByPairName = async (pairName) => {
 };
 
 const getCurrencyRatesByFrom = async (from, to) => {
-  let data = await CurrencyRates.findOne({ from: from });
+  if (!from) {
+    return null;
+  }
+
+  let data = await CurrencyRates.findOne({ from: from.toUpperCase() });
 
   if (data) {
+    let rates = [];
     if (to) {
-      data.rates = data.rates.filter((item) => item.to === to);
+      const targetList = toArray(to)
+        .filter((item) => item)
+        .map((item) => item.toUpperCase());
+      rates = data.rates.filter((item) => targetList.includes(item.to.toUpperCase()));
     }
-    return data;
+    return {
+      success: true,
+      from,
+      to,
+      rates
+    };
   }
   return null;
 };
