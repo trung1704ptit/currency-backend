@@ -40,7 +40,7 @@ const getCurrencyRatesByFrom = async (from, to) => {
   if (data) {
     let rates = [];
     if (to) {
-      const targetList = toArray(to)
+      const targetList = to
         .split(',')
         .filter((item) => item)
         .map((item) => item.toUpperCase());
