@@ -31,18 +31,15 @@ const getCurrencyByPairName = async (pairName) => {
 };
 
 const getCurrencyRatesByFrom = async (from, to) => {
-  console.log('from, to:', from, to)
   if (!from) {
     return null;
   }
 
-  let data = await CurrencyRates.findOne({ from: from.toUpperCase() });
-  console.log('data:', data);
+  let data = await CurrencyRates.findOne({ from });
 
   if (data) {
     let rates = [];
     if (to) {
-      console.log(data)
       const targetList = to
         .split(',')
         .filter((item) => item)
@@ -56,12 +53,7 @@ const getCurrencyRatesByFrom = async (from, to) => {
       rates,
     };
   }
-  return {
-    success: false,
-    from,
-    to,
-    rates: [],
-  };
+  return null;
 };
 
 const convertCurrency = async (from, to, amount) => {
