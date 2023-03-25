@@ -130,10 +130,10 @@ const updateCurrencyByBatch = (currencies) => {
     return group;
   }, {});
 
-  Object.keys(groupByCategory).forEach((key) => {
+  Object.keys(groupByCategory).forEach(async (key) => {
     const dataCached = { lastUpdated: new Date(), rates: groupByCategory[key] };
     redisClient.set(key, JSON.stringify(dataCached), 'EX', 5 * 60);
-    updateCurrencyRates(key, groupByCategory[key]);
+    await updateCurrencyRates(key, groupByCategory[key]);
   });
 };
 
