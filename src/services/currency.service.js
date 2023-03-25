@@ -47,7 +47,7 @@ const getCurrencyRatesByFrom = async (from, to) => {
   }
 
   if (data) {
-    let rates = [];
+    let rates = data.rates;
     if (to) {
       const targetList = to
         .split(',')
