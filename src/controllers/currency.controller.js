@@ -39,9 +39,17 @@ const getCurrencyRates = catchAsync(async (req, res) => {
   res.send(currencyData);
 });
 
+const convertCurrency = catchAsync(async (req, res) => {
+  const { query } = req;
+  const { from, to, amount } = query;
+  const currencyData = await currencyService.convertCurrency(from, to, amount);
+  res.send(currencyData);
+});
+
 module.exports = {
   updateCurrency,
   handleSocketConnect,
   getSingleCurrency,
   getCurrencyRates,
+  convertCurrency,
 };

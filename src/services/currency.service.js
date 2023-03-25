@@ -31,15 +31,18 @@ const getCurrencyByPairName = async (pairName) => {
 };
 
 const getCurrencyRatesByFrom = async (from, to) => {
+  console.log('from, to:', from, to)
   if (!from) {
     return null;
   }
 
   let data = await CurrencyRates.findOne({ from: from.toUpperCase() });
+  console.log('data:', data);
 
   if (data) {
     let rates = [];
     if (to) {
+      console.log(data)
       const targetList = to
         .split(',')
         .filter((item) => item)
@@ -50,8 +53,37 @@ const getCurrencyRatesByFrom = async (from, to) => {
       success: true,
       from,
       to,
-      rates
+      rates,
     };
+  }
+  return {
+    success: false,
+    from,
+    to,
+    rates: [],
+  };
+};
+
+const convertCurrency = async (from, to, amount) => {
+  if (from && to && amount) {
+    let data = await CurrencyRates.findOne({ from: from.toUpperCase() });
+
+    if (data) {
+      const targetList = to
+        .split(',')
+        .filter((item) => item)
+        .map((item) => item.toUpperCase());
+      const rates = data.rates.filter((item) => targetList.includes(item.to.toUpperCase()));
+      const converts = rates.map((item) => ({ ...item, amount, result: item.price * amount }));
+
+      return {
+        success: true,
+        from,
+        to,
+        amount,
+        converts,
+      };
+    }
   }
   return null;
 };
@@ -103,6 +135,7 @@ const updateCurrencyByBatch = (currencies) => {
 
 module.exports = {
   createCurrency,
+  convertCurrency,
   getCurrencyByPairName,
   updateCurrencyByPairName,
   updateCurrencyByBatch,
