@@ -1,7 +1,8 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
+const redisClient = require('../redis');
 
 function round(value, decimals) {
-  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+  return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 /**
  * Create a currency
@@ -37,8 +38,13 @@ const getCurrencyRatesByFrom = async (from, to) => {
   if (!from) {
     return null;
   }
-
-  let data = await CurrencyRates.findOne({ from });
+  let data;
+  const dataCached = await redisClient.get(from);
+  if (dataCached) {
+    data = JSON.parse(dataCached);
+  } else {
+    data = await CurrencyRates.findOne({ from });
+  }
 
   if (data) {
     let rates = [];
@@ -61,8 +67,13 @@ const getCurrencyRatesByFrom = async (from, to) => {
 
 const convertCurrency = async (from, to, amount) => {
   if (from && to && amount) {
-    let data = await CurrencyRates.findOne({ from: from.toUpperCase() });
-
+    let data;
+    const dataCached = await redisClient.get(from);
+    if (dataCached) {
+      data = JSON.parse(dataCached);
+    } else {
+      data = await CurrencyRates.findOne({ from: from.toUpperCase() });
+    }
     if (data) {
       const targetList = to
         .split(',')
@@ -119,12 +130,10 @@ const updateCurrencyByBatch = (currencies) => {
     return group;
   }, {});
 
-  // currencies.forEach(async (item) => {
-  //   await updateCurrencyByPairName(item.pairName, item);
-  // });
-
-  Object.keys(groupByCategory).forEach(async (key) => {
-    await updateCurrencyRates(key, groupByCategory[key]);
+  Object.keys(groupByCategory).forEach((key) => {
+    const dataCached = { lastUpdated: new Date(), rates: groupByCategory[key] };
+    redisClient.set(key, JSON.stringify(dataCached), 'EX', 5 * 60);
+    updateCurrencyRates(key, groupByCategory[key]);
   });
 };
 
