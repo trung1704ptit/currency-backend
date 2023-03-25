@@ -1,5 +1,8 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
-const { toArray } = require('lodash');
+
+function round(value, decimals) {
+  return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
 /**
  * Create a currency
  * @param {Object} currencyBody
@@ -66,7 +69,7 @@ const convertCurrency = async (from, to, amount) => {
         .filter((item) => item)
         .map((item) => item.toUpperCase());
       const rates = data.rates.filter((item) => targetList.includes(item.to.toUpperCase()));
-      const converts = rates.map((item) => ({ ...item, amount, result: item.price * amount }));
+      const converts = rates.map((item) => ({ ...item, amount, result: round(item.price * amount, 4) }));
 
       return {
         success: true,
