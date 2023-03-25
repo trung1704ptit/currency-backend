@@ -1,4 +1,4 @@
-const { CurrencyPair, CurrencyMap } = require('../models');
+const { CurrencyPair, CurrencyRates } = require('../models');
 
 /**
  * Create a currency
@@ -10,10 +10,10 @@ const createCurrency = async (currencyBody) => {
   return result;
 };
 
-const createCurrencyMap = async (base, currencyList) => {
-  const result = await CurrencyMap.create({
+const createCurrencyRates = async (base, currencyList) => {
+  const result = await CurrencyRates.create({
     base,
-    mapping: currencyList,
+    rates: currencyList,
   });
 
   return result;
@@ -30,8 +30,8 @@ const getCurrencyByPairName = async (pairName) => {
   return null;
 };
 
-const getCurrencyMapByBaseName = async (baseName, to) => {
-  let data = await CurrencyMap.findOne({ base: baseName });
+const getCurrencyRatesByBaseName = async (baseName, to) => {
+  let data = await CurrencyRates.findOne({ base: baseName });
 
   if (data) {
     if (to) {
@@ -57,12 +57,12 @@ const updateCurrencyByPairName = async (pairName, currencyBody) => {
   return currency;
 };
 
-const updateCurrencyMap = async (base, currencyList) => {
-  const currencyMap = await getCurrencyMapByBaseName(base);
-  if (!currencyMap) {
-    return createCurrencyMap(base, currencyList);
+const updateCurrencyRates = async (base, currencyList) => {
+  const currencyRates = await getCurrencyRatesByBaseName(base);
+  if (!currencyRates) {
+    return createCurrencyRates(base, currencyList);
   }
-  await CurrencyMap.findOneAndUpdate({ base: base }, { $set: { mapping: currencyList } });
+  await CurrencyRates.findOneAndUpdate({ base: base }, { $set: { rates: currencyList, lastUpdated: new Date() } });
 };
 
 /**
@@ -83,7 +83,7 @@ const updateCurrencyByBatch = (currencies) => {
   // });
 
   Object.keys(groupByCategory).forEach(async (key) => {
-    await updateCurrencyMap(key, groupByCategory[key]);
+    await updateCurrencyRates(key, groupByCategory[key]);
   });
 };
 
@@ -92,5 +92,5 @@ module.exports = {
   getCurrencyByPairName,
   updateCurrencyByPairName,
   updateCurrencyByBatch,
-  getCurrencyMapByBaseName,
+  getCurrencyRatesByBaseName,
 };

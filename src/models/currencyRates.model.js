@@ -8,7 +8,7 @@ const currencyMapSchema = mongoose.Schema({
     trim: true,
     unique: true,
   },
-  mapping: {
+  rates: {
     type: mongoose.Mixed,
   },
   lastUpdated: {
