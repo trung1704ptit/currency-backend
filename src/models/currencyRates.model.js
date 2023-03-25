@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 
-const currencyMapSchema = mongoose.Schema({
+const currencyRatesSchema = mongoose.Schema({
   from: {
     type: String,
     required: true,
@@ -18,7 +18,7 @@ const currencyMapSchema = mongoose.Schema({
 });
 
 // add plugin that converts mongoose to json
-currencyMapSchema.plugin(toJSON);
+currencyRatesSchema.plugin(toJSON);
 
-const CurrencyMap = mongoose.model('CurrencyMap', currencyMapSchema);
-module.exports = CurrencyMap;
+const CurrencyRates = mongoose.model('CurrencyRates', currencyRatesSchema);
+module.exports = CurrencyRates;
