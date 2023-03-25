@@ -35,7 +35,7 @@ const getCurrencyRatesByBaseName = async (baseName, to) => {
 
   if (data) {
     if (to) {
-      data.mapping = data.mapping.filter((item) => item.to === to);
+      data.rates = data.rates.filter((item) => item.to === to);
     }
     return data;
   }
