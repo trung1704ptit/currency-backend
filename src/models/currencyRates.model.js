@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const { toJSON } = require('./plugins');
 
 const currencyMapSchema = mongoose.Schema({
-  base: {
+  from: {
     type: String,
     required: true,
     trim: true,

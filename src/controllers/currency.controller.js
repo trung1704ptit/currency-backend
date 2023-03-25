@@ -35,7 +35,7 @@ const getSingleCurrency = catchAsync(async (req, res) => {
 const getCurrencyRates = catchAsync(async (req, res) => {
   const { query } = req;
   const { from, to } = query;
-  const currencyData = await currencyService.getCurrencyRatesByBaseName(from, to);
+  const currencyData = await currencyService.getCurrencyRatesByFrom(from, to);
   res.send(currencyData);
 });
 

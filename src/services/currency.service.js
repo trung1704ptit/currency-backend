@@ -10,9 +10,9 @@ const createCurrency = async (currencyBody) => {
   return result;
 };
 
-const createCurrencyRates = async (base, currencyList) => {
+const createCurrencyRates = async (from, currencyList) => {
   const result = await CurrencyRates.create({
-    base,
+    from,
     rates: currencyList,
   });
 
@@ -30,8 +30,8 @@ const getCurrencyByPairName = async (pairName) => {
   return null;
 };
 
-const getCurrencyRatesByBaseName = async (baseName, to) => {
-  let data = await CurrencyRates.findOne({ base: baseName });
+const getCurrencyRatesByFrom = async (from, to) => {
+  let data = await CurrencyRates.findOne({ from: from });
 
   if (data) {
     if (to) {
@@ -57,12 +57,12 @@ const updateCurrencyByPairName = async (pairName, currencyBody) => {
   return currency;
 };
 
-const updateCurrencyRates = async (base, currencyList) => {
-  const currencyRates = await getCurrencyRatesByBaseName(base);
+const updateCurrencyRates = async (from, currencyList) => {
+  const currencyRates = await getCurrencyRatesByFrom(from);
   if (!currencyRates) {
-    return createCurrencyRates(base, currencyList);
+    return createCurrencyRates(from, currencyList);
   }
-  await CurrencyRates.findOneAndUpdate({ base: base }, { $set: { rates: currencyList, lastUpdated: new Date() } });
+  await CurrencyRates.findOneAndUpdate({ from }, { $set: { rates: currencyList, lastUpdated: new Date() } });
 };
 
 /**
@@ -92,5 +92,5 @@ module.exports = {
   getCurrencyByPairName,
   updateCurrencyByPairName,
   updateCurrencyByBatch,
-  getCurrencyRatesByBaseName,
+  getCurrencyRatesByFrom,
 };
