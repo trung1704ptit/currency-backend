@@ -7,23 +7,29 @@ function round(value, decimals) {
 }
 
 cron.schedule('*/5 * * * *', async () => {
-  // running a task every five minutes;
-  const keys = await redisClient.keys('*');
-  if (keys) {
-    keys.forEach(async (key) => {
-      let cached = await redisClient.get(key);
-      cached = JSON.parse(cached);
-      const existOnDB = await CurrencyRates.findOne({ from: key });
-      if (existOnDB) {
-        // update
-        await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: cached.rates, lastUpdated: new Date() } });
-      } else {
-        // create new one
-        createCurrencyRates(key, cached.rates);
-      }
-    });
+  try {
+    // running a task every five minutes;
+    let keys = await redisClient.keys('*');
+    keys = keys.filter((k) => k !== 'ping');
+    if (keys.length > 0) {
+      keys.forEach(async (key) => {
+        let cached = await redisClient.get(key);
+        if (cached) {
+          const existOnDB = await CurrencyRates.findOne({ from: key });
+          if (existOnDB) {
+            // update
+            await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: cached.rates, lastUpdated: new Date() } });
+          } else {
+            // create new one
+            createCurrencyRates(key, cached.rates);
+          }
+        }
+      });
+    }
+    console.log('saved data into database');
+  } catch (error) {
+    console.log('Failed on cron job', error);
   }
-  console.log('saved data into database');
 });
 
 /**
