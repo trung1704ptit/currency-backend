@@ -1,9 +1,30 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
 const redisClient = require('../redis');
+const cron = require('node-cron');
 
 function round(value, decimals) {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
+
+cron.schedule('*/5 * * * *', async () => {
+  // running a task every five minutes;
+  const keys = await redisClient.keys('*');
+  if (keys) {
+    keys.forEach(async (key) => {
+      const value = await redisClient.get(key);
+      const existOnDB = await CurrencyRates.findOne({ from: key });
+      if (existOnDB) {
+        // update
+        await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: value.rates, lastUpdated: new Date() } });
+      } else {
+        // create new one
+        createCurrencyRates(key, value.rates);
+      }
+    });
+  }
+  console.log('saved data into database');
+});
+
 /**
  * Create a currency
  * @param {Object} currencyBody
