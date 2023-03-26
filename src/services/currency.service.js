@@ -6,7 +6,7 @@ function round(value, decimals) {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 
-cron.schedule('*/0.5 * * * *', async () => {
+cron.schedule('*/5 * * * *', async () => {
   try {
     // running a task every five minutes;
     let keys = await redisClient.keys('*');
