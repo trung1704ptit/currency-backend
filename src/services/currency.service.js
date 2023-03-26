@@ -11,14 +11,15 @@ cron.schedule('*/5 * * * *', async () => {
   const keys = await redisClient.keys('*');
   if (keys) {
     keys.forEach(async (key) => {
-      const value = await redisClient.get(key);
+      let cached = await redisClient.get(key);
+      cached = JSON.parse(cached);
       const existOnDB = await CurrencyRates.findOne({ from: key });
       if (existOnDB) {
         // update
-        await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: value.rates, lastUpdated: new Date() } });
+        await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: cached.rates, lastUpdated: new Date() } });
       } else {
         // create new one
-        createCurrencyRates(key, value.rates);
+        createCurrencyRates(key, cached.rates);
       }
     });
   }
