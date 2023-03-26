@@ -6,7 +6,7 @@ function round(value, decimals) {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 
-cron.schedule('*/5 * * * *', async () => {
+cron.schedule('*/0.5 * * * *', async () => {
   try {
     // running a task every five minutes;
     let keys = await redisClient.keys('*');
@@ -14,14 +14,18 @@ cron.schedule('*/5 * * * *', async () => {
     if (keys.length > 0) {
       keys.forEach(async (key) => {
         let cached = await redisClient.get(key);
+        cached = JSON.parse(cached);
         if (cached) {
           const existOnDB = await CurrencyRates.findOne({ from: key });
           if (existOnDB) {
             // update
-            await CurrencyRates.findOneAndUpdate({ from: key }, { $set: { rates: cached.rates, lastUpdated: new Date() } });
+            await CurrencyRates.findOneAndUpdate(
+              { from: key },
+              { $set: { rates: cached.rates, lastUpdated: cached.lastUpdated } }
+            );
           } else {
             // create new one
-            createCurrencyRates(key, cached.rates);
+            await createCurrencyRates(key, cached.rates);
           }
         }
       });
