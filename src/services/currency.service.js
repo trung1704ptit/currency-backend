@@ -46,14 +46,14 @@ const createCurrency = async (currencyBody) => {
   return result;
 };
 
-const createCurrencyRates = async (from, currencyList) => {
-  const result = await CurrencyRates.create({
-    from,
-    rates: currencyList,
-  });
+// const createCurrencyRates = async (from, currencyList) => {
+//   const result = await CurrencyRates.create({
+//     from,
+//     rates: currencyList,
+//   });
 
-  return result;
-};
+//   return result;
+// };
 
 /**
  * @param {ObjectId} pairName
@@ -74,9 +74,11 @@ const getCurrencyRatesByFrom = async (from, to) => {
   const dataCached = await redisClient.get(from);
   if (dataCached) {
     data = JSON.parse(dataCached);
-  } else {
-    data = await CurrencyRates.findOne({ from });
   }
+  
+  // else {
+  //   data = await CurrencyRates.findOne({ from });
+  // }
 
   if (data) {
     let rates = data.rates;
@@ -103,9 +105,11 @@ const convertCurrency = async (from, to, amount) => {
     const dataCached = await redisClient.get(from);
     if (dataCached) {
       data = JSON.parse(dataCached);
-    } else {
-      data = await CurrencyRates.findOne({ from: from.toUpperCase() });
     }
+    
+    // else {
+    //   data = await CurrencyRates.findOne({ from: from.toUpperCase() });
+    // }
     if (data) {
       const targetList = to
         .split(',')
@@ -126,28 +130,28 @@ const convertCurrency = async (from, to, amount) => {
   return null;
 };
 
-/**
- * @param {ObjectId} pairName
- * @param {Object} currencyBody
- * @returns {Promise<Currency>}
- */
-const updateCurrencyByPairName = async (pairName, currencyBody) => {
-  const currency = await getCurrencyByPairName(pairName);
-  if (!currency) {
-    return createCurrency(currencyBody);
-  }
-  Object.assign(currency, currencyBody);
-  await currency.save();
-  return currency;
-};
+// /**
+//  * @param {ObjectId} pairName
+//  * @param {Object} currencyBody
+//  * @returns {Promise<Currency>}
+//  */
+// const updateCurrencyByPairName = async (pairName, currencyBody) => {
+//   const currency = await getCurrencyByPairName(pairName);
+//   if (!currency) {
+//     return createCurrency(currencyBody);
+//   }
+//   Object.assign(currency, currencyBody);
+//   await currency.save();
+//   return currency;
+// };
 
-const updateCurrencyRates = async (from, currencyList) => {
-  const currencyRates = await getCurrencyRatesByFrom(from);
-  if (!currencyRates) {
-    return createCurrencyRates(from, currencyList);
-  }
-  await CurrencyRates.findOneAndUpdate({ from }, { $set: { rates: currencyList, lastUpdated: new Date() } });
-};
+// const updateCurrencyRates = async (from, currencyList) => {
+//   const currencyRates = await getCurrencyRatesByFrom(from);
+//   if (!currencyRates) {
+//     return createCurrencyRates(from, currencyList);
+//   }
+//   await CurrencyRates.findOneAndUpdate({ from }, { $set: { rates: currencyList, lastUpdated: new Date() } });
+// };
 
 /**
  *
@@ -165,7 +169,7 @@ const updateCurrencyByBatch = (currencies) => {
   Object.keys(groupByCategory).forEach(async (key) => {
     const dataCached = { lastUpdated: new Date(), rates: groupByCategory[key] };
     redisClient.set(key, JSON.stringify(dataCached));
-    await updateCurrencyRates(key, groupByCategory[key]);
+    // await updateCurrencyRates(key, groupByCategory[key]);
   });
 };
 
@@ -173,7 +177,7 @@ module.exports = {
   createCurrency,
   convertCurrency,
   getCurrencyByPairName,
-  updateCurrencyByPairName,
+  // updateCurrencyByPairName,
   updateCurrencyByBatch,
   getCurrencyRatesByFrom,
 };
