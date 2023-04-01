@@ -16,21 +16,21 @@ const updateCurrency = catchAsync(async (req, res) => {
   res.send(200);
 });
 
-const handleSocketConnect = async (socket) => {
+const handleSocketConnect = catchAsync(async (socket) => {
   const { query } = socket.handshake;
   // query in DB
   const cacheCurrency = await currencyService.getCurrencyByPairName(query.pairName);
-  if (cacheCurrency) {
+  if (cacheCurrency && socket) {
     socket.emit(query.pairName, cacheCurrency);
   }
-};
-
-const getSingleCurrency = catchAsync(async (req, res) => {
-  const { query } = req;
-  const { from, to } = query;
-  const currencyData = await currencyService.getCurrencyByPairName(`${from}/${to}`);
-  res.send(currencyData);
 });
+
+// const getSingleCurrency = catchAsync(async (req, res) => {
+//   const { query } = req;
+//   const { from, to } = query;
+//   const currencyData = await currencyService.getCurrencyByPairName(`${from}/${to}`);
+//   res.send(currencyData);
+// });
 
 const getCurrencyRates = catchAsync(async (req, res) => {
   const { query } = req;
@@ -49,7 +49,7 @@ const convertCurrency = catchAsync(async (req, res) => {
 module.exports = {
   updateCurrency,
   handleSocketConnect,
-  getSingleCurrency,
+  // getSingleCurrency,
   getCurrencyRates,
   convertCurrency,
 };

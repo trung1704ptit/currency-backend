@@ -60,10 +60,16 @@ const createCurrency = async (currencyBody) => {
  * @returns {Promise<Currency>}
  */
 const getCurrencyByPairName = async (pairName) => {
-  const data = await CurrencyPair.findOne({ pairName });
+  let data = null;
+  if (!pairName) return data;
 
-  if (data) return data;
-  return null;
+  const from = pairName.split('/')[0];
+  const dataCached = await redisClient.get(from);
+  if (dataCached) {
+    data = JSON.parse(dataCached);
+  }
+
+  return data;
 };
 
 const getCurrencyRatesByFrom = async (from, to) => {
