@@ -1,5 +1,7 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
 const redisClient = require('../redis');
+const catchAsync = require('../utils/catchAsync');
+
 // const cron = require('node-cron');
 
 function round(value, decimals) {
@@ -41,10 +43,10 @@ function round(value, decimals) {
  * @param {Object} currencyBody
  * @returns {Promise<Currency>}
  */
-const createCurrency = async (currencyBody) => {
+const createCurrency = catchAsync(async currencyBody => {
   const result = CurrencyPair.create(currencyBody);
   return result;
-};
+});
 
 // const createCurrencyRates = async (from, currencyList) => {
 //   const result = await CurrencyRates.create({
@@ -59,20 +61,21 @@ const createCurrency = async (currencyBody) => {
  * @param {ObjectId} pairName
  * @returns {Promise<Currency>}
  */
-const getCurrencyByPairName = async (pairName) => {
+const getCurrencyByPairName = catchAsync(async (pairName) => {
   let data = null;
   if (!pairName) return data;
 
-  const from = pairName.split('/')[0];
-  const dataCached = await redisClient.get(from);
+  const spliter = pairName.split('/');
+  const dataCached = await redisClient.get(spliter[0]);
   if (dataCached) {
     data = JSON.parse(dataCached);
+    data = data.rates.find(item => item.to === to);
   }
 
   return data;
-};
+});
 
-const getCurrencyRatesByFrom = async (from, to) => {
+const getCurrencyRatesByFrom = catchAsync(async (from, to) => {
   if (!from) {
     return null;
   }
@@ -103,9 +106,9 @@ const getCurrencyRatesByFrom = async (from, to) => {
     };
   }
   return null;
-};
+});
 
-const convertCurrency = async (from, to, amount) => {
+const convertCurrency = catchAsync(async (from, to, amount) => {
   if (from && to && amount) {
     let data;
     const dataCached = await redisClient.get(from);
@@ -134,7 +137,7 @@ const convertCurrency = async (from, to, amount) => {
     }
   }
   return null;
-};
+});
 
 // /**
 //  * @param {ObjectId} pairName
@@ -164,7 +167,7 @@ const convertCurrency = async (from, to, amount) => {
  * @param {Object[]} currencies
  */
 
-const updateCurrencyByBatch = (currencies) => {
+const updateCurrencyByBatch = catchAsync(async (currencies) => {
   const groupByCategory = currencies.reduce((group, product) => {
     const { from } = product;
     group[from] = group[from] ?? [];
@@ -177,7 +180,7 @@ const updateCurrencyByBatch = (currencies) => {
     redisClient.set(key, JSON.stringify(dataCached));
     // await updateCurrencyRates(key, groupByCategory[key]);
   });
-};
+});
 
 module.exports = {
   createCurrency,
