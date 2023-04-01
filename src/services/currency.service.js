@@ -116,7 +116,7 @@ const convertCurrency = async (from, to, amount) => {
         .filter((item) => item)
         .map((item) => item.toUpperCase());
       const rates = data.rates.filter((item) => targetList.includes(item.to.toUpperCase()));
-      const converts = rates.map((item) => ({ ...item, amount, result: round(item.price * amount, 4) }));
+      const converts = rates.map((item) => ({ ...item, amount, result: round(item.price * amount, 6) }));
 
       return {
         success: true,
