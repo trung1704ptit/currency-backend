@@ -1,40 +1,40 @@
 const { CurrencyPair, CurrencyRates } = require('../models');
 const redisClient = require('../redis');
-const cron = require('node-cron');
+// const cron = require('node-cron');
 
 function round(value, decimals) {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 
-cron.schedule('*/5 * * * *', async () => {
-  try {
-    // running a task every five minutes;
-    let keys = await redisClient.keys('*');
-    keys = keys.filter((k) => k !== 'ping');
-    if (keys.length > 0) {
-      keys.forEach(async (key) => {
-        let cached = await redisClient.get(key);
-        cached = JSON.parse(cached);
-        if (cached) {
-          const existOnDB = await CurrencyRates.findOne({ from: key });
-          if (existOnDB) {
-            // update
-            await CurrencyRates.findOneAndUpdate(
-              { from: key },
-              { $set: { rates: cached.rates, lastUpdated: cached.lastUpdated } }
-            );
-          } else {
-            // create new one
-            await createCurrencyRates(key, cached.rates);
-          }
-        }
-      });
-    }
-    console.log('saved data into database');
-  } catch (error) {
-    console.log('Failed on cron job', error);
-  }
-});
+// cron.schedule('*/5 * * * *', async () => {
+//   try {
+//     // running a task every five minutes;
+//     let keys = await redisClient.keys('*');
+//     keys = keys.filter((k) => k !== 'ping');
+//     if (keys.length > 0) {
+//       keys.forEach(async (key) => {
+//         let cached = await redisClient.get(key);
+//         cached = JSON.parse(cached);
+//         if (cached) {
+//           const existOnDB = await CurrencyRates.findOne({ from: key });
+//           if (existOnDB) {
+//             // update
+//             await CurrencyRates.findOneAndUpdate(
+//               { from: key },
+//               { $set: { rates: cached.rates, lastUpdated: cached.lastUpdated } }
+//             );
+//           } else {
+//             // create new one
+//             await createCurrencyRates(key, cached.rates);
+//           }
+//         }
+//       });
+//     }
+//     console.log('saved data into database');
+//   } catch (error) {
+//     console.log('Failed on cron job', error);
+//   }
+// });
 
 /**
  * Create a currency
