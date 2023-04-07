@@ -70,7 +70,7 @@ const getCurrencyByPairName = async (pairName) => {
     const dataCached = await redisClient.get(spliter[0]);
     if (dataCached) {
       data = JSON.parse(dataCached);
-      data = data.rates.find((item) => item.to === to);
+      data = data.rates.find((item) => item.to === spliter[1]);
     }
 
     return data;
