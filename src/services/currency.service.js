@@ -6,6 +6,27 @@ function round(value, decimals) {
   return Number(Math.round(value + 'e' + decimals) + 'e-' + decimals);
 }
 
+function groupByCategory(currencies) {
+  const result = currencies.reduce((group, product) => {
+    const { from } = product;
+    group[from] = group[from] ?? [];
+    group[from].push(product);
+    return group;
+  }, {});
+  return result;
+}
+
+function mergeList(list1, list2) {
+  list1.forEach((item, index) => {
+    const finder = list2.find((val) => val.to === item.to);
+    if (finder) {
+      list1[index] = finder;
+      list2 = list2.filter((val) => val.to !== finder.to);
+    }
+  });
+  return list1;
+}
+
 // cron.schedule('*/5 * * * *', async () => {
 //   try {
 //     // running a task every five minutes;
@@ -35,7 +56,6 @@ function round(value, decimals) {
 //     console.log('Failed on cron job', error);
 //   }
 // });
-
 
 /**
  * @param {ObjectId} pairName
@@ -127,23 +147,27 @@ const convertCurrency = async (from, to, amount) => {
   }
 };
 
-
 /**
  *
  * @param {Object[]} currencies
  */
 const updateCurrencyByBatch = async (currencies) => {
   try {
-    const groupByCategory = currencies.reduce((group, product) => {
-      const { from } = product;
-      group[from] = group[from] ?? [];
-      group[from].push(product);
-      return group;
-    }, {});
+    currencies = groupByCategory(currencies);
+    Object.keys(currencies).forEach(async (key) => {
+      let rates = currencies[key];
+      let prevRates = await clientRedis.get(key);
 
-    Object.keys(groupByCategory).forEach(async (key) => {
-      const dataCached = { lastUpdated: new Date(), rates: groupByCategory[key] };
-      redisClient.set(key, JSON.stringify(dataCached));
+      if (prevRates) {
+        prevRates = JSON.parse(prevRates).rates;
+        rates = mergeList(currencies, prevRates)
+      }
+      // loop inside each of rates, update for each pair.
+
+      const dataCached = { lastUpdated: new Date(), rates };
+
+      // set key like: 'USD' with rates of 'USD'
+      await redisClient.set(key, JSON.stringify(dataCached));
     });
   } catch (error) {
     console.log('error in updateCurrencyByBatch:', error);
