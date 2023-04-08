@@ -10,6 +10,7 @@ services:
       - '5000:5000'
     depends_on:
       - mongodb
+      - cache
     volumes:
       - .:/usr/src/node-app
     networks:
@@ -21,11 +22,34 @@ services:
       - '27017:27017'
     volumes:
       - dbdata:/data/db
+    restart: on-failure
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=mongo
+      - MONGO_INITDB_ROOT_PASSWORD=mongo-password
+    networks:
+      - node-network
+
+  cache:
+    image: redis:latest
+    restart: always
+    ports:
+      - '6379:6379'
+    command:
+      - /bin/sh
+      - -c
+      - redis-server --requirepass "$${REDIS_PASSWORD:?REDIS_PASSWORD variable is not set}"
+    volumes: 
+      - cache:/data
+    environment:
+      - REDIS_PASSWORD=redis
     networks:
       - node-network
 
 volumes:
   dbdata:
+  cache:
+    driver: local
+
 
 networks:
   node-network:
