@@ -1,8 +1,12 @@
 const redis = require('redis');
 // const { promisify } = require('util');
-// const config = require('./config');
+const config = require('../config/config');
 
-const redisClient = redis.createClient();
+const redisClient = redis.createClient({
+  url: config.redisUrl,
+});
+
+// console.log('config.redis_password:', config.redis_password)
 // const password = config.redis_password || null;
 // if (password && password !== 'null') {
 //   redisClient.auth(password, (err, res) => {
@@ -17,10 +21,6 @@ redisClient.on('connected', function () {
 redisClient.on('error', function (err) {
   console.log('Redis error.', err);
 });
-setInterval(function () {
-  console.log('Keeping alive - Node.js Performance Test with Redis');
-  redisClient.set('ping', 'pong');
-}, 1000 * 60 * 4);
 
 (async () => {
   await redisClient.connect();

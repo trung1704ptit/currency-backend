@@ -156,11 +156,11 @@ const updateCurrencyByBatch = async (currencies) => {
     currencies = groupByCategory(currencies);
     Object.keys(currencies).forEach(async (key) => {
       let rates = currencies[key];
-      let prevRates = await clientRedis.get(key);
+      let prevRates = await redisClient.get(key);
 
-      if (prevRates) {
+      if (prevRates && rates) {
         prevRates = JSON.parse(prevRates).rates;
-        rates = mergeList(currencies, prevRates)
+        rates = mergeList(rates, prevRates)
       }
       // loop inside each of rates, update for each pair.
 
